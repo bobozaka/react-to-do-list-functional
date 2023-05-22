@@ -26,18 +26,23 @@ const ToDoList = () => {
 
   const handleAddTodo = () => {
     if (inputValue.trim() !== '') {
-      setTodos([...todos, { text: inputValue, completed: false }]);
+      const newTodo = {
+        id: Date.now(), // Добавляем уникальный идентификатор
+        text: inputValue,
+        completed: false,
+      };
+      setTodos([...todos, newTodo]);
       setInputValue('');
     }
   };
 
-  const handleDeleteTodo = (index) => {
-    const newTodos = [...todos];
-    newTodos.splice(index, 1);
+  const handleDeleteTodo = (id) => {
+    const newTodos = todos.filter((todo) => todo.id !== id);
     setTodos(newTodos);
   };
 
-  const handleEditTodo = (index) => {
+  const handleEditTodo = (id) => {
+    const index = todos.findIndex((todo) => todo.id === id);
     setEditIndex(index);
     setEditValue(todos[index].text);
   };
@@ -52,9 +57,13 @@ const ToDoList = () => {
     }
   };
 
-  const handleToggleComplete = (index) => {
+  const handleToggleComplete = (id) => {
     const newTodos = [...todos];
-    newTodos[index].completed = !newTodos[index].completed;
+    const index = newTodos.findIndex((todo) => todo.id === id);
+    newTodos[index] = {
+      ...newTodos[index],
+      completed: !newTodos[index].completed,
+    };
     setTodos(newTodos);
   };
 
@@ -85,16 +94,16 @@ const ToDoList = () => {
       <h2>Активные задачи</h2>
       <AnimatePresence>
         <ul className={styles.taskList}>
-          {activeTodos.map((todo, index) => (
+          {activeTodos.map((todo) => (
             <TaskItem
-              key={index}
+              key={todo.id}
               task={todo}
-              editMode={editIndex === index}
+              editMode={editIndex === todo.id}
               editValue={editValue}
-              onEdit={() => handleEditTodo(index)}
+              onEdit={() => handleEditTodo(todo.id)}
               onUpdate={handleUpdateTodo}
-              onDelete={() => handleDeleteTodo(index)}
-              onToggleComplete={() => handleToggleComplete(index)}
+              onDelete={() => handleDeleteTodo(todo.id)}
+              onToggleComplete={() => handleToggleComplete(todo.id)}
               onEditInputChange={(e) => setEditValue(e.target.value)}
             />
           ))}
@@ -104,14 +113,17 @@ const ToDoList = () => {
       <h2>Завершенные задачи</h2>
       <AnimatePresence>
         <ul className={styles.taskList}>
-          {completedTodos.map((todo, index) => (
+          {completedTodos.map((todo) => (
             <TaskItem
-              key={index}
+              key={todo.id}
               task={todo}
-              editMode={false}
-              editValue=""
-              onDelete={() => handleDeleteTodo(index)}
-              onToggleComplete={() => handleToggleComplete(index)}
+              editMode={editIndex === todo.id}
+              editValue={editValue}
+              onEdit={() => handleEditTodo(todo.id)}
+              onUpdate={handleUpdateTodo}
+              onDelete={() => handleDeleteTodo(todo.id)}
+              onToggleComplete={() => handleToggleComplete(todo.id)}
+              onEditInputChange={(e) => setEditValue(e.target.value)}
             />
           ))}
         </ul>

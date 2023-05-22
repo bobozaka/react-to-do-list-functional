@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import styles from '../../styles/main.module.scss';
 
@@ -12,16 +12,14 @@ const TaskItem = ({
   onToggleComplete,
   onEditInputChange,
 }) => {
-  const [inputValue, setInputValue] = useState(task.text);
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       onUpdate();
     }
+  };
+
+  const handleToggleComplete = () => {
+    onToggleComplete();
   };
 
   return (
@@ -45,7 +43,7 @@ const TaskItem = ({
             <button onClick={onDelete}>Удалить</button>
           </>
         )}
-        <button onClick={onToggleComplete}>
+        <button onClick={handleToggleComplete}>
           {task.completed ? 'Отметить как незавершенное' : 'Отметить как завершенное'}
         </button>
       </div>
