@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskItem from './TaskItem';
 import styles from '../../styles/main.module.scss';
@@ -28,12 +28,6 @@ const ToDoList = () => {
     if (inputValue.trim() !== '') {
       setTodos([...todos, { text: inputValue, completed: false }]);
       setInputValue('');
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleAddTodo();
     }
   };
 
@@ -82,15 +76,9 @@ const ToDoList = () => {
 
   return (
     <div className={styles.container}>
-      <h1>To-Do List</h1>
+      <h1>Список дел</h1>
       <div className={styles.addTask}>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Введите задачу..."
-        />
+        <input type="text" value={inputValue} onChange={handleInputChange} />
         <button onClick={handleAddTodo}>Добавить</button>
       </div>
 
@@ -101,22 +89,27 @@ const ToDoList = () => {
             <TaskItem
               key={index}
               task={todo}
+              editMode={editIndex === index}
+              editValue={editValue}
               onEdit={() => handleEditTodo(index)}
+              onUpdate={handleUpdateTodo}
               onDelete={() => handleDeleteTodo(index)}
               onToggleComplete={() => handleToggleComplete(index)}
+              onEditInputChange={(e) => setEditValue(e.target.value)}
             />
           ))}
         </ul>
       </AnimatePresence>
 
-      <h2>Выполненные задачи</h2>
+      <h2>Завершенные задачи</h2>
       <AnimatePresence>
         <ul className={styles.taskList}>
           {completedTodos.map((todo, index) => (
             <TaskItem
               key={index}
               task={todo}
-              onEdit={() => handleEditTodo(index)}
+              editMode={false}
+              editValue=""
               onDelete={() => handleDeleteTodo(index)}
               onToggleComplete={() => handleToggleComplete(index)}
             />
@@ -124,12 +117,17 @@ const ToDoList = () => {
         </ul>
       </AnimatePresence>
 
-      <div className={styles.taskActions}>
-        {activeTodos.length > 0 && <button onClick={handleCompleteAll}>Завершить все</button>}
-        {completedTodos.length > 0 && (
-          <button onClick={handleClearCompleted}>Очистка завершена</button>
-        )}
-      </div>
+      {completedTodos.length > 0 && (
+        <button className={styles.clearButton} onClick={handleClearCompleted}>
+          Очистить завершенные
+        </button>
+      )}
+
+      {activeTodos.length > 0 && (
+        <button className={styles.completeAllButton} onClick={handleCompleteAll}>
+          Завершить все
+        </button>
+      )}
     </div>
   );
 };
